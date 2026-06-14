@@ -1,1 +1,72 @@
+name: Build Joke Generator Application
 
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        node-version: [16.x, 18.x]
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+    
+    - name: Install backend dependencies
+      run: |
+        cd joke-generator/backend
+        npm install
+      
+    - name: Check backend code
+      run: |
+        cd joke-generator/backend
+        npm list
+    
+    - name: Verify backend structure
+      run: |
+        cd joke-generator/backend
+        test -f server.js && echo "✅ server.js found"
+        test -f package.json && echo "✅ package.json found"
+        test -d services && echo "✅ services directory found"
+        test -d controllers && echo "✅ controllers directory found"
+        test -d routes && echo "✅ routes directory found"
+    
+    - name: Verify frontend files
+      run: |
+        cd joke-generator/frontend
+        test -f index.html && echo "✅ index.html found"
+        test -f styles.css && echo "✅ styles.css found"
+        test -f app.js && echo "✅ app.js found"
+    
+    - name: Check Node modules installation
+      run: |
+        cd joke-generator/backend
+        test -d node_modules && echo "✅ node_modules installed"
+        test -f node_modules/express/package.json && echo "✅ Express installed"
+        test -f node_modules/axios/package.json && echo "✅ Axios installed"
+        test -f node_modules/cors/package.json && echo "✅ CORS installed"
+        test -f node_modules/node-cache/package.json && echo "✅ Node-Cache installed"
+    
+    - name: Verify server.js syntax
+      run: |
+        cd joke-generator/backend
+        node -c server.js && echo "✅ server.js syntax is valid"
+    
+    - name: Build Summary
+      run: |
+        echo "🎉 Build completed successfully!"
+        echo "📦 Backend is ready for deployment"
+        echo "🎨 Frontend is ready for serving"
+        echo "✅ All dependencies installed"
+        echo "✅ Code syntax verified"
